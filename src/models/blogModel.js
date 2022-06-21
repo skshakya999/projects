@@ -14,16 +14,14 @@ const blogSchema = new mongoose.Schema( {
         ref: 'Author',
         required: true
     },
-    tags: {
-        type:Array
-    },
+    tags: [String],
     category:{
-        type:String,
+        type:[String],
         required:true
     },
 
     subcategory:{ 
-        type:Array,
+        type:[String],
     },
 
     isPublished:{
@@ -46,7 +44,7 @@ const blogSchema = new mongoose.Schema( {
      isPublished: {
         type: Boolean, 
         default: false
-    },
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Blog', blogSchema)
