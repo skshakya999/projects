@@ -33,10 +33,9 @@ const deletePost = async function (req, res) {
     try {
         const blogId = req.params.blogId
         if (!validId(blogId)) return res.status(400).send({ status: false, msg: "Invalid blog id!" })
-        let blog = await BlogModel.findOne({ _id: blogId, isDeleted: false })
-        if (!blog) return res.status(404).send({ status: false, msg: "No blog found!" })
-
+       
         let deletedData = await BlogModel.findOneAndUpdate({ _id: blogId, isDeleted: false }, { isDeleted: true }, { new: true })
+        if (!deletedData) return res.status(404).send({ status: false, msg: "No blog found!" })
         res.status(200).send({ blog: deletedData })
     }
     catch (err) {
@@ -52,11 +51,7 @@ const deletePostQuery = async function(req,res){
     let tag =req.query.tag
     let subcategory =req.query.subcategory
     let unpublished =req.query.unpublished
-    console.log(category)
-    console.log(authorid)
-    console.log(tag)
-    console.log(subcategory)
-    console.log(unpublished)
+    
 
     if (!validId(authorid)) return res.status(400).send({ status: false, msg: "Invalid author id!" })
     let deletedData = await BlogModel.findOneAndUpdate({ category:category,authorId:authorid,tags:tag,subcategory:subcategory, isPublished: unpublished }, { isDeleted: true }, { new: true })
