@@ -46,15 +46,26 @@ const deletePost = async function (req, res) {
 
 const deletePostQuery = async function(req,res){
     
+   try {
     let category =req.query.category
     let authorid =req.query.authorid
     let tag =req.query.tag
     let subcategory =req.query.subcategory
     let unpublished =req.query.unpublished
+    console.log(category)
+    console.log(authorid)
+    console.log(tag)
+    console.log(subcategory)
+    console.log(unpublished)
 
     if (!validId(authorid)) return res.status(400).send({ status: false, msg: "Invalid author id!" })
-    let deletedData = await BlogModel.findOneAndUpdate({ category:{$eleMatch:{$eq:category}},authorId:authorid,tags:{$eleMatch:{$eq:tag}},subcategory:{$eleMatch:{$eq:subcategory}}, isPublished: unpublished }, { isDeleted: true }, { new: true })
+    let deletedData = await BlogModel.findOneAndUpdate({ category:category,authorId:authorid,tags:tag,subcategory:subcategory, isPublished: unpublished }, { isDeleted: true }, { new: true })
+    if(!deletedData) return res.status(404).send({ status: false, msg: "No blog found!" })
     res.status(200).send({ blog: deletedData })
+}
+catch(err){
+    res.status(400).send({ status: false,error:err })
+}
 
 
 }
