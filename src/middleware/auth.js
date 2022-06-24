@@ -26,7 +26,7 @@ const authorise = async function(req,res,next){
 
     const token = req.headers["x-api-key"];
 
-    if (!token) res.status(404).send({ status: false, msg: "Token not found" })
+    if (!token) res.status(400).send({ status: false, msg: "Token is required" })
 
     const blogId = req.params.blogId
 
