@@ -7,11 +7,11 @@ const blogController= require("../controllers/blogController")
 
 router.post("/authors", authorController.createAuthor)
 router.post("/login", authorController.loginAuthor)
-router.post("/createBlog",Auth.authenticate, blogController.createBlog)
-router.put("/blogs/:blogId",Auth.authenticate,  Auth.authorise, blogController.updateBlog)
-router.post("/blogs/:blogId",Auth.authenticate,  Auth.authorise, blogController.deletePost)
-router.post("/blogs",Auth.authenticate,  Auth.authorise, blogController.deletePostQuery)
-router.get("/getBlogs",Auth.authenticate, blogController.getBlogs)
+router.post("/createBlog",blogController.createBlog)
+router.put("/blogs/:blogId",  Auth.authorise, blogController.updateBlog)
+router.post("/blogs/:blogId",  Auth.authorise, blogController.deletePost)
+router.post("/blogs",  Auth.authorise, blogController.deletePostQuery)
+router.get("/getBlogs",blogController.getBlogs)
 
 
 module.exports = router;

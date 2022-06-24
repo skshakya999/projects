@@ -13,6 +13,7 @@ const createAuthor = async function (req, res) {
     }
 }
 
+
  const loginAuthor = async function (req,res){
 
     let authorDetail = req.body
@@ -20,7 +21,7 @@ const createAuthor = async function (req, res) {
     let password = authorDetail.password
 
     const loginData = await AuthorModel.findOne({email:email,password:password})
-    console.log(loginData._id.toString())
+ 
 
     if(!loginData) return res.status(404).send({status:false,msg:"No author found with these credentials"})
 

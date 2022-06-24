@@ -3,24 +3,7 @@ const BlogModel = require("../models/blogModel");
 const validate = require("../validations/validate")
 
 
-const authenticate = function(req,res,next){
-    try{
-    const token = req.headers["x-api-key"];
 
-    if (!token) res.status(404).send({ status: false, msg: "Token not found" })
-
-    let decodeToken = jwt.verify(token, 'group No-12')
-
-    if(!decodeToken) return res.status(401).send({status:false,msg:"Unauthorise access///"})
-
-    console.log(decodeToken.authorId)
-
-    next()
-}
-catch(err){
-    res.status(400).send({status:false,msg:err.message})
-}
-}
 
 const authorise = async function(req,res,next){
 
@@ -40,7 +23,7 @@ const authorise = async function(req,res,next){
 
         var author=blogdata.authorId
     }
-    
+
     else{
         var author = req.query.authorid
     }
@@ -50,5 +33,5 @@ const authorise = async function(req,res,next){
     if(decodeToken.authorId != author) return res.status(401).send({status:false,msg:"Unauthorise access"})
     next()
 }
-module.exports.authenticate=authenticate
+
 module.exports.authorise=authorise
