@@ -7,7 +7,7 @@ const authenticate = function(req,res,next){
     try{
     const token = req.headers["x-api-key"];
 
-    if (!token) res.status(404).send({ status: false, msg: "Token not found" })
+    if (!token) res.status(400).send({ status: false, msg: "Token is required" })
 
     let decodeToken = jwt.verify(token, 'group No-12')
 
