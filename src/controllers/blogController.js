@@ -1,16 +1,19 @@
 const BlogModel = require("../models/blogModel");
-const mongoose = require('mongoose');
 const Validate = require('../validations/validate')
 
-
-
 const createBlog = async function (req, res) {
-    let blog = req.body
-    let authorid = blog.authorId
+    try{
+        let blog = req.body
+    
     let authorCreated = await BlogModel.create(blog)
 
     res.status(200).send({ data: authorCreated })
 }
+catch(err){
+    res.status(500).send({ status:false ,msg:err.message })
+}
+}
+
 
 const getBlogs = async function (req, res) {
     try {
@@ -96,23 +99,16 @@ const updateBlog = async function (req, res) {
         const blogId = req.params.blogId
 
 
-        if (!Validate.validId(blogId)) return res.status(400).send({ status: false, msg: "Invalid blog id!" })
+        if (!Validate.validId(blogId)) return res.status(500).send({ status: false, msg: "Invalid blog id!" })
 
         let data = req.body
         let updateData ={}
 
         if (Validate.isValidRequestBody(data)) {
 
-            const{ title,body,authorId,tags,category,subcategory,deletedAt,isDeleted,publishedAt,isPublished} = data
+            const{ title,body,tags,subcategory} = data
             
-            
-
-            if (Validate.validId(authorId)){
-
-                updateData['authorId']=authorId
-            }else{
-                return res.status(400).send({ status: false, msg: "Invalid author id!" })
-            }
+        
 
             if (data.hasOwnProperty("title")) {
                 if (!Validate.isValid(title ,"string")) {
@@ -128,92 +124,44 @@ const updateBlog = async function (req, res) {
                 updateData["body"] = body.trim();
             }
 
-            if (data.hasOwnProperty("category")) {
-                if (!Validate.isValid(category,"string")) {
-                    return res.status(400).send({ status: false, message: " Blog category should be in valid format"});
-                }
-                updateData["category"] = body.trim();
-            }
-
             if (data.hasOwnProperty("tags")) {
-                if (Array.isArray(tags)) {
-                    for (let i = 0; i < tags.length; i++) {
-                        if (!Validate.isValid(tags[i],"string")) {
-                            return res.status(400).send({ status: false, message: " Blog tags must be in valid format" });
-                        }
-                        updateData["tags"] = tags[i].trim();
-                    }
-                } else {
+               
                     if (!Validate.isValid(tags,"string")) {
                         return res.status(400).send({ status: false, message: " Blog tags must be in valid format" });
                     }
-                    updateData["tags"] = tags.trim();
-                }
+                   
+                
             }
 
             if (data.hasOwnProperty("subcategory")) {
-                if (Array.isArray(subcategory)) {
-                    for (let i = 0; i < subcategory.length; i++) {
-                        if (!Validate.isValid(subcategory[i],"string")) {
-                            return res.status(400).send({ status: false, message: " Blog subcategory is not valid" });
-                        }
-                        updateData["subcategory"] = subcategory[i].trim();
-                    }
-                } else {
+                
                     if (!Validate.isValid(subcategory,"string")) {
                         return res.status(400).send({ status: false, message: " Blog subcategory is not valid" });
                     }
-                    updateData["subcategory"] = subcategory.trim();
-                }
+                    
             }
-
-            if (data.hasOwnProperty("isDeleted")) {
-                if (!Validate.isValid(isDeleted,"boolean")) {
-                    return res.status(400).send({ status: false, message: " isDeleted not a boolean value"});
-                }
-                updateData["isDeleted"] = isDeleted
-            }
-
-            if (data.hasOwnProperty("isPublished")) {
-                if (!Validate.isValid(isPublished,"boolean")) {
-                    return res.status(400).send({ status: false, message: " isPublished not a boolean value" });
-                }
-                updateData["isPublished"] = isPublished
-            }
-
-            if (data.hasOwnProperty("deletedAt")) {
-                if (!Validate.isValid(deletedAt,"string")) {
-                    return res.status(400).send({ status: false, message: " deletedAt not in date formate"});
-                }
-                updateData["deletedAt"] = deletedAt
-            }
-            
-
-
-
-            let updatedData = await BlogModel.findOneAndUpdate({ _id: blogId, isDeleted: false }, updateData, { new: true })
+           
+            let updatedData = await BlogModel.findOneAndUpdate({ _id: blogId, isDeleted: false }, {updateData,$push:{tags:tags},$push:{subcategory:subcategory}}, { new: true })
             if (!updatedData) return res.status(404).send({ status: false, msg: "No blog found!" })
             res.status(200).send({ blog: updatedData })
         }
     }
     catch (err) {
-        res.status(400).send({ error: err.message })
+        res.status(500).send({ error: err.message })
     }
 }
-
-
 
 const deletePost = async function (req, res) {
     try {
         const blogId = req.params.blogId
-        if (!Validate.validId(blogId)) return res.status(400).send({ status: false, msg: "Invalid blog id!" })
+        if (!Validate.validId(blogId)) return res.status(500).send({ status: false, msg: "Invalid blog id!" })
 
         let deletedData = await BlogModel.findOneAndUpdate({ _id: blogId, isDeleted: false }, { isDeleted: true }, { new: true })
         if (!deletedData) return res.status(404).send({ status: false, msg: "No blog found!" })
         res.status(200).send({ blog: deletedData })
     }
     catch (err) {
-        res.status(400).send({ status: false, error: err.message })
+        res.status(500).send({ status: false, error: err.message })
     }
 }
 
@@ -227,13 +175,13 @@ const deletePostQuery = async function (req, res) {
         let unpublished = req.query.unpublished
 
 
-        if (!Validate.validId(authorid)) return res.status(400).send({ status: false, msg: "Invalid author id!" })
+        if (!Validate.validId(authorid)) return res.status(500).send({ status: false, msg: "Invalid author id!" })
         let deletedData = await BlogModel.findOneAndUpdate({ category: category, authorId: authorid, tags: tag, subcategory: subcategory, isPublished: unpublished }, { isDeleted: true }, { new: true })
         if (!deletedData) return res.status(404).send({ status: false, msg: "No blog found!" })
         res.status(200).send({ blog: deletedData })
     }
     catch (err) {
-        res.status(400).send({ status: false, error: err })
+        res.status(500).send({ status: false, error: err })
     }
 
 

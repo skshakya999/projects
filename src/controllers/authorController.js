@@ -9,7 +9,7 @@ const createAuthor = async function (req, res) {
         res.send({ data: authorCreated })
     }
     catch (err) {
-        res.status(400).send({ status: false, error: err })
+        res.status(500).send({ status: false, error: err })
     }
 }
 
